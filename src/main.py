@@ -118,7 +118,42 @@ class DrugInformationSystem:
             elif choice == '3':
                 print("\nЭта функция находится в разработке.")
                 # Placeholder for future functionality
+                def generate_prescription():
+                    print("\n=== Медицинский Рецепт (Medical Prescription) ===")
+    
+                    # Doctor/Patient Details
+                    doctor_name = input("ФИО врача: ")
+                    patient_name = input("ФИО пациента: ")
+                    patient_age = input("Возраст пациента: ")
+                    date = input("Дата (ДД.ММ.ГГГГ): ")
+    
+                    # Medication Details
+                    drug_name = input("Название препарата (на латинском в родительном падеже, например 'Analgini'): ")
+                    dosage_form = input("Лекарственная форма (таблетки/мазь/раствор и т.д.): ")
+                    strength = input("Дозировка (например, 0.5): ")
+                    quantity = input("Количество (например, 10): ")
+    
+                    # Instructions
+                    instructions_pharmacist = input("Указания для аптеки (например, 'D.t.d. №10 in tab.'): ")
+                    instructions_patient = input("Указания для пациента (на русском, например, 'По 1 таблетке 2 раза в день'): ")
+    
+                    # Generate Prescription
+                    prescription = f"""
+                     Рецепт
+                     Врач: {doctor_name}
+                     Пациент: {patient_name}, {patient_age} лет
+                     Дата: {date}
 
+                     Rp.: {dosage_form} {drug_name} {strength}
+                     {instructions_pharmacist}
+                     S. {instructions_patient}
+
+                     Подпись и печать врача: __________
+                     """
+                    print(prescription)
+
+                    # Run the function
+                generate_prescription()
             else:
                 print("Некорректный выбор. Пожалуйста, введите число от 0 до 3.")
 
