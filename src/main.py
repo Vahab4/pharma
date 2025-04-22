@@ -1,6 +1,10 @@
+from flask import Flask, request, render_template
 import pandas as pd
 from collections import defaultdict
+import os
 
+# Initialize Flask with explicit template folder
+app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__file__), 'templates'))
 
 class DrugInformationSystem:
     def __init__(self, excel_file='drugs_data_with_latin.xlsx'):
@@ -11,8 +15,9 @@ class DrugInformationSystem:
     def _load_data(self):
         """Load drug data from Excel file"""
         try:
-            df = pd.read_excel(self.excel_file)
-            # Convert to dictionary with drug names as keys (case-insensitive)
+            # Get the absolute path to the Excel file
+            excel_path = os.path.join(os.path.dirname(__file__), self.excel_file)
+            df = pd.read_excel(excel_path)
             return df.set_index(df['Name'].str.lower()).to_dict('index')
         except FileNotFoundError:
             raise FileNotFoundError(f"Excel file {self.excel_file} not found")
@@ -23,8 +28,8 @@ class DrugInformationSystem:
         """Create a mapping of classifications to drugs"""
         classification_map = defaultdict(list)
         for drug_name, drug_info in self.drugs_df.items():
-            classification = drug_info['Classification'].split('(')[0].strip()  # Get main classification
-            classification_map[classification].append(drug_name.title())  # Store with proper capitalization
+            classification = drug_info['Classification'].split('(')[0].strip()
+            classification_map[classification].append(drug_name.title())
         return dict(classification_map)
 
     def search_drug(self, drug_name):
@@ -32,136 +37,92 @@ class DrugInformationSystem:
         drug_name = drug_name.lower()
         return self.drugs_df.get(drug_name)
 
-    def display_drug_info(self, drug_name):
-        """Display formatted drug information for a single drug"""
-        drug_info = self.search_drug(drug_name)
+# Debugging paths
+print(f"Current directory: {os.getcwd()}")
+print(f"Template folder exists: {os.path.exists('templates')}")
+print(f"Prescription form exists: {os.path.exists('templates/prescription_form.html')}")
 
-        if drug_info:
-            print(f"\n=== {drug_name.upper()} ===")
-            for key, value in drug_info.items():
-                if key != 'Name' and pd.notna(value):
-                    print(f"{key.capitalize()}: {value}")
-        else:
-            print(f"Препарат '{drug_name}' не найден в базе данных.")
+# Initialize the system when the app starts
+drug_system = DrugInformationSystem()
 
-    def classify_drugs_interactive(self):
-        """
-        Interactive mode for classifying multiple drugs
-        Collects drugs one by one until 'finish' is entered
-        """
-        drug_list = []
-        print("\nВводите названия препаратов по одному (для завершения введите 'finish'):")
-
-        while True:
-            drug_input = input("Название препарата: ").strip()
-
-            if drug_input.lower() == 'finish':
-                if not drug_list:
-                    print("Не введено ни одного препарата!")
-                    return
-                break
-
-            if drug_input:  # Only add non-empty inputs
-                drug_list.append(drug_input)
-
-        # Classify the collected drugs
-        self._classify_and_display(drug_list)
-
-    def _classify_and_display(self, drug_names):
-        """
-        Internal method to classify drugs and display results
-        Args:
-            drug_names: list of drug names to classify
-        """
-        classified = defaultdict(list)
-        not_found = []
-
-        for name in drug_names:
-            drug_info = self.search_drug(name)
-            if drug_info:
-                classification = drug_info['Classification'].split('(')[0].strip()
-                classified[classification].append(name.title())
-            else:
-                not_found.append(name)
-
-        # Display results
-        print("\n=== Классификация препаратов ===")
-        for classification, drugs in classified.items():
-            print(f"\n{classification}:")
-            print(", ".join(sorted(drugs)))
-
-        if not_found:
-            print(f"\nПрепараты не найдены: {', '.join(not_found)}")
-
-    def run(self):
-        """Main interactive interface"""
-        while True:
-            print("\nВыберите действие:")
-            print("1. Поиск информации по одному препарату")
-            print("2. Классификация нескольких препаратов")
-            print("3. (Функция в разработке)")
-            print("0. Выход")
-
-            choice = input("Ваш выбор (0-3): ").strip()
-
-            if choice == '0':
-                print("Выход из программы.")
-                break
-
-            elif choice == '1':
-                drug_name = input("Введите название препарата: ").strip()
-                self.display_drug_info(drug_name)
-
-            elif choice == '2':
-                self.classify_drugs_interactive()
-
-            elif choice == '3':
-                print("\nЭта функция находится в разработке.")
-                # Placeholder for future functionality
-                def generate_prescription():
-                    print("\n=== Медицинский Рецепт (Medical Prescription) ===")
-    
-                    # Doctor/Patient Details
-                    doctor_name = input("ФИО врача: ")
-                    patient_name = input("ФИО пациента: ")
-                    patient_age = input("Возраст пациента: ")
-                    date = input("Дата (ДД.ММ.ГГГГ): ")
-    
-                    # Medication Details
-                    drug_name = input("Название препарата (на латинском в родительном падеже, например 'Analgini'): ")
-                    dosage_form = input("Лекарственная форма (таблетки/мазь/раствор и т.д.): ")
-                    strength = input("Дозировка (например, 0.5): ")
-                    quantity = input("Количество (например, 10): ")
-    
-                    # Instructions
-                    instructions_pharmacist = input("Указания для аптеки (например, 'D.t.d. №10 in tab.'): ")
-                    instructions_patient = input("Указания для пациента (на русском, например, 'По 1 таблетке 2 раза в день'): ")
-    
-                    # Generate Prescription
-                    prescription = f"""
-                     Рецепт
-                     Врач: {doctor_name}
-                     Пациент: {patient_name}, {patient_age} лет
-                     Дата: {date}
-
-                     Rp.: {dosage_form} {drug_name} {strength}
-                     {instructions_pharmacist}
-                     S. {instructions_patient}
-
-                     Подпись и печать врача: __________
-                     """
-                    print(prescription)
-
-                    # Run the function
-                generate_prescription()
-            else:
-                print("Некорректный выбор. Пожалуйста, введите число от 0 до 3.")
-
-
-# Example usage
-if __name__ == "__main__":
+@app.route('/', methods=['GET', 'POST'])
+def home():
     try:
-        system = DrugInformationSystem()
-        system.run()
+        if request.method == 'POST':
+            action = request.form.get('action')
+            
+            if action == 'search':
+                drug_name = request.form.get('drug_name', '').strip()
+                if drug_name:
+                    drug_info = drug_system.search_drug(drug_name)
+                    return render_template('result.html', 
+                                        drug_name=drug_name.title(), 
+                                        drug_info=drug_info)
+            
+            elif action == 'classify':
+                drug_list = [name.strip() for name in request.form.get('drug_list', '').split(',') if name.strip()]
+                classified = defaultdict(list)
+                not_found = []
+                
+                for name in drug_list:
+                    drug_info = drug_system.search_drug(name)
+                    if drug_info:
+                        classification = drug_info['Classification'].split('(')[0].strip()
+                        classified[classification].append(name.title())
+                    else:
+                        not_found.append(name)
+                
+                return render_template('classification.html', 
+                                    classified=classified, 
+                                    not_found=not_found)
+        
+        return render_template('index.html')
+    
     except Exception as e:
-        print(f"Ошибка: {str(e)}")
+        print(f"Error in home route: {str(e)}")
+        return render_template('error.html', error_message=str(e)), 500
+
+@app.route('/prescription', methods=['GET', 'POST'])
+def prescription():
+    try:
+        if request.method == 'POST':
+            # Collect all prescription data
+            prescription_data = {
+                'doctor_name': request.form.get('doctor_name', '').strip(),
+                'patient_name': request.form.get('patient_name', '').strip(),
+                'patient_age': request.form.get('patient_age', '').strip(),
+                'date': request.form.get('date', '').strip(),
+                'drug_name': request.form.get('drug_name', '').strip(),
+                'dosage_form': request.form.get('dosage_form', '').strip(),
+                'strength': request.form.get('strength', '').strip(),
+                'quantity': request.form.get('quantity', '').strip(),
+                'instructions_pharmacist': request.form.get('instructions_pharmacist', '').strip(),
+                'instructions_patient': request.form.get('instructions_patient', '').strip()
+            }
+            
+            # Generate prescription text
+            prescription_text = f"""
+            Рецепт
+            Врач: {prescription_data['doctor_name']}
+            Пациент: {prescription_data['patient_name']}, {prescription_data['patient_age']} лет
+            Дата: {prescription_data['date']}
+
+            Rp.: {prescription_data['dosage_form']} {prescription_data['drug_name']} {prescription_data['strength']}
+            {prescription_data['instructions_pharmacist']}
+            S. {prescription_data['instructions_patient']}
+
+            Подпись и печать врача: __________
+            """
+            
+            return render_template('prescription_result.html', 
+                                prescription_text=prescription_text,
+                                data=prescription_data)
+        
+        return render_template('prescription_form.html')
+    
+    except Exception as e:
+        print(f"Error in prescription route: {str(e)}")
+        return render_template('error.html', error_message=str(e)), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)

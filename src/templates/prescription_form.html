@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Prescription</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        form div { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, textarea { width: 100%; padding: 8px; }
+        button { padding: 10px 15px; }
+        .back-link { display: block; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Medical Prescription</h1>
+    
+    <form method="POST" action="/prescription">
+        <div>
+            <label for="doctor_name">Doctor's Name:</label>
+            <input type="text" id="doctor_name" name="doctor_name" required>
+        </div>
+        
+        <div>
+            <label for="patient_name">Patient's Name:</label>
+            <input type="text" id="patient_name" name="patient_name" required>
+        </div>
+        
+        <div>
+            <label for="patient_age">Patient Age:</label>
+            <input type="text" id="patient_age" name="patient_age" required>
+        </div>
+        
+        <div>
+            <label for="date">Date (DD.MM.YYYY):</label>
+            <input type="text" id="date" name="date" required>
+        </div>
+        
+        <div>
+            <label for="drug_name">Drug Name (in Latin, genitive case):</label>
+            <input type="text" id="drug_name" name="drug_name" required>
+        </div>
+        
+        <div>
+            <label for="dosage_form">Dosage Form:</label>
+            <input type="text" id="dosage_form" name="dosage_form" required>
+        </div>
+        
+        <div>
+            <label for="strength">Strength:</label>
+            <input type="text" id="strength" name="strength" required>
+        </div>
+        
+        <div>
+            <label for="quantity">Quantity:</label>
+            <input type="text" id="quantity" name="quantity" required>
+        </div>
+        
+        <div>
+            <label for="instructions_pharmacist">Pharmacy Instructions (e.g., 'D.t.d. №10 in tab.'):</label>
+            <textarea id="instructions_pharmacist" name="instructions_pharmacist" required></textarea>
+        </div>
+        
+        <div>
+            <label for="instructions_patient">Patient Instructions (in Russian):</label>
+            <textarea id="instructions_patient" name="instructions_patient" required></textarea>
+        </div>
+        
+        <button type="submit">Generate Prescription</button>
+    </form>
+    
+    <a href="/" class="back-link">← Back to main menu</a>
+</body>
+</html>

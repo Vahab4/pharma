@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prescription Generated</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .prescription { white-space: pre-wrap; font-family: monospace; background: #f5f5f5; padding: 20px; }
+        .back-link { display: block; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Prescription Generated</h1>
+    
+    <div class="prescription">{{ prescription_text }}</div>
+    
+    <a href="/prescription" class="back-link">← Create another prescription</a>
+    <a href="/" class="back-link">← Back to main menu</a>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Drug Classification</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h2 { margin-top: 25px; }
+        .back-link { display: block; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Drug Classification Results</h1>
+    
+    {% if classified %}
+        {% for class, drugs in classified.items() %}
+            <h2>{{ class }}</h2>
+            <p>{{ drugs|join(', ') }}</p>
+        {% endfor %}
+    {% endif %}
+    
+    {% if not_found %}
+        <h2>Not Found:</h2>
+        <p>{{ not_found|join(', ') }}</p>
+    {% endif %}
+    
+    <a href="/" class="back-link">← Back to main menu</a>
+</body>
+</html>
